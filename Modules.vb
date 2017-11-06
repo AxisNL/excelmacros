@@ -313,3 +313,63 @@ Function Huurtoeslag_Simple_EP_2017(vermogen, kale_huur, servicekosten_energie, 
     Huurtoeslag_Simple_EP_2017 = toeslag_deel_A + toeslag_deel_B
 
 End Function
+
+
+Function Zorgtoeslag_Simple_EP_2017(vermogen, rekeninkomen)
+    '1persoons huishouden, geen buitenland van toepassing
+
+    If vermogen > 107752 Then
+        Zorgtoeslag_Simple_EP_2017 = 0
+        Exit Function
+    End If
+
+    'Stap 1: bepaal de standaardpremie
+    'De standaardpremie is voor 2017 vastgesteld op € 1.530. Bij een aanvrager met een toeslagpartner wordt tweemaal de standaardpremie genomen (€ 3.060).
+    Dim standaardpremie
+    standaardpremie = 1530
+
+    'Stap 2: bereken het gezamenlijke toetsingsinkomen
+    Dim toetsingsinkomen
+    toetsingsinkomen = rekeninkomen
+
+    'Uw klant hee  geen recht op zorgtoeslag als het toetsingsinkomen hoger is dan:
+    '• € 27.857 (aanvrager zonder toeslagpartner)
+    '• € 35.116 (aanvrager met toeslagpartner)
+
+    If toetsingsinkomen > 27857 Then
+        Zorgtoeslag_Simple_EP_2017 = 0
+        Exit Function
+    End If
+
+    'Stap 3: bereken de normpremie
+    'De normpremie wordt berekend met het drempelinkomen en het gezamenlijke toetsingsinkomen.
+    'Het drempelinkomen is voor 2017 vastgesteld op € 20.109.
+    Dim drempelinkomen
+    drempelinkomen = 20109
+
+    'Voor een aanvrager zonder toeslagpartner:
+    'Normpremie = 2,305% x drempelinkomen + 13,46% (toetsingsinkomen - drempelinkomen)
+    'Leidt het tweede deel van de formule tot een negatief bedrag? Reken dan met 0.
+
+    Dim normpremie, tmp
+
+    tmp = 0.1346 * (toetsingsinkomen - drempelinkomen)
+    If tmp < 0 Then
+        tmp = 0
+    End If
+    normpremie = (0.02305 * drempelinkomen) + tmp
+
+    'De maximale zorgtoeslag wordt uitgekeerd bij een toetsingsinkomen op of onder het
+    'drempelinkomen. In 2017 is dat voor een aanvrager zonder toeslagpartner € 1.066
+    'en voor een aanvrager met toeslagpartner € 2.043.
+    '??
+
+    'Stap 4: bereken de zorgtoeslag voor uw klant die in Nederland woont
+    'Woont uw klant in het buitenland? Ga dan verder met stap 5. Voor een aanvrager zonder toeslagpartner:
+    Dim zorgtoeslag
+    zorgtoeslag = standaardpremie - normpremie
+
+
+    Zorgtoeslag_Simple_EP_2017 = zorgtoeslag
+
+End Function
